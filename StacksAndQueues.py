@@ -70,3 +70,63 @@ class Queue:
     def is_empty(self):
         return len(self.items) == 0
 
+
+class StackMin:
+    """3.2"""
+    def __init__(self):
+        self.items_stack = Stack()
+        self.min_data_stack = Stack()
+
+    def push(self, item):
+        self.items_stack.push(item)
+        if self.min_data_stack.is_empty():
+            self.min_data_stack.push({'data': item, 'occurrence': 1})
+            return
+        current_min = self.min_data_stack.peek()
+        if item < current_min['data']:
+            self.min_data_stack.push({'data': item, 'occurrence': 1})
+        else:
+            current_min['occurrence'] += 1
+
+    def pop(self):
+        self.items_stack.pop()
+        current_min = self.min_data_stack.peek()
+        if current_min['occurrence'] == 1:
+            self.min_data_stack.pop()
+        else:
+            current_min['occurrence'] -= 1
+
+    def min(self):
+        return self.min_data_stack.peek()['data']
+
+
+# s = StackMin()
+# s.push(5)
+# print(s.items_stack.items)
+# print(s.min())
+# s.push(8)
+# print(s.items_stack.items)
+# print(s.min())
+# s.push(2)
+# print(s.items_stack.items)
+# print(s.min())
+# s.push(4)
+# print(s.items_stack.items)
+# print(s.min())
+# s.push(1)
+# print(s.items_stack.items)
+# print(s.min())
+# print('--')
+# s.pop()
+# print(s.items_stack.items)
+# print(s.min())
+# s.pop()
+# print(s.items_stack.items)
+# print(s.min())
+# s.pop()
+# print(s.items_stack.items)
+# print(s.min())
+# s.pop()
+# print(s.items_stack.items)
+# print(s.min())
+# -----------------------------------------------------------------------------
