@@ -8,6 +8,13 @@ class Node:
         self.children = children
 
 
+class BtNode:
+    def __init__(self, data):
+        self.data = data
+        self.right = None
+        self.left = None
+
+
 def visit(node):
     print(node.data)
 
@@ -83,7 +90,7 @@ def route_between_nodes(node_a, node_b):
 
 
 def construct_min_tree(numbers, fromm, to):
-    """4.2"""
+    """4.2 helper"""
     if fromm > to:
         return None
     if fromm == to:
@@ -96,11 +103,51 @@ def construct_min_tree(numbers, fromm, to):
 
 
 def minimal_tree(numbers):
+    """4.2"""
     if numbers is None or len(numbers) == 0:
         return None
     return construct_min_tree(numbers, 0, len(numbers) - 1)
 
 
-nums = [1, 4, 7, 13, 20, 42, 58, 61]
-res = minimal_tree(nums)
-print(res)
+# nums = [1, 4, 7, 13, 20, 42, 58, 61]
+# res = minimal_tree(nums)
+# print(res)
+
+
+def is_bst(node, minv=None, maxv=None):
+    """4.5"""
+    if node is None:
+        return True
+
+    if node.left is not None:
+        if node.left.data >= node.data:
+            return False
+        if minv is not None and node.left.data < minv:
+            return False
+        if not is_bst(node.left, minv, node.data):
+            return False
+
+    if node.right is not None:
+        if node.right.data <= node.data:
+            return False
+        if maxv is not None and node.right.data > maxv:
+            return False
+        if not is_bst(node.right, node.data, maxv):
+            return False
+
+    return True
+
+
+v = BtNode(20)
+j = BtNode(10)
+k = BtNode(25)
+m = BtNode(7)
+# v.left = j
+# j.left = m
+# j.right = k
+# a good bst:
+v.left = j
+v.right = k
+j.left = m
+print(is_bst(v))
+
