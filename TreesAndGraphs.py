@@ -15,6 +15,14 @@ class BtNode:
         self.left = None
 
 
+class BtNodeWithParent:
+    def __init__(self, data):
+        self.data = data
+        self.parent = None
+        self.right = None
+        self.left = None
+
+
 def visit(node):
     print(node.data)
 
@@ -138,16 +146,66 @@ def is_bst(node, minv=None, maxv=None):
     return True
 
 
-v = BtNode(20)
-j = BtNode(10)
-k = BtNode(25)
-m = BtNode(7)
+# v = BtNode(20)
+# j = BtNode(10)
+# k = BtNode(25)
+# m = BtNode(7)
 # v.left = j
 # j.left = m
 # j.right = k
 # a good bst:
-v.left = j
-v.right = k
-j.left = m
-print(is_bst(v))
+# v.left = j
+# v.right = k
+# j.left = m
+# print(is_bst(v))
 
+
+def successor(node):
+    """4.6"""
+    if node is None:
+        return None
+
+    if node.right is not None:
+        res = node.right
+        while res.left is not None:
+            res = res.left
+        return res
+
+    if node.parent is None:
+        return None
+
+    # we will need to go up and check opposing to the parent, are we the right or the left branch.
+    # if we are the left, next node is the parent
+    if node.parent.left is node:
+        return node.parent
+
+    # if not, we will go up until we are no longer the right child
+    tmp_node = node
+    tmp_parent = node.parent
+    while tmp_parent.right is tmp_node:
+        tmp_node = tmp_parent
+        tmp_parent = tmp_parent.parent
+        if tmp_parent is None:
+            return None
+
+    return tmp_parent
+
+
+a = BtNodeWithParent(5)
+b = BtNodeWithParent(10)
+c = BtNodeWithParent(2)
+d = BtNodeWithParent(6)
+e = BtNodeWithParent(7)
+f = BtNodeWithParent(8)
+a.right = b
+a.left = c
+b.parent = a
+b.left = e
+c.parent = a
+e.parent = b
+e.left = d
+e.right = f
+d.parent = e
+f.parent = e
+res = successor(b)
+print(res if res is None else res.data)
