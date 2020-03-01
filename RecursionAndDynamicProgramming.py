@@ -23,7 +23,7 @@ def triple_steps_mem(steps):
     elif steps == 3:
         return 4
 
-    all_steps = [0] * (steps+1)
+    all_steps = [0] * (steps + 1)
     all_steps[0] = 0
     all_steps[1] = 1
     all_steps[2] = 2
@@ -79,13 +79,13 @@ def find_mi(ints, min_idx, max_idx):
         return mid_idx
 
     # search left
-    left_idx = min(mid_idx-1, mid_val)
+    left_idx = min(mid_idx - 1, mid_val)
     left = find_mi(ints, min_idx, left_idx)
     if left > -1:
         return left
 
     # search right
-    right_idx = max(mid_idx+1, mid_val)
+    right_idx = max(mid_idx + 1, mid_val)
     return find_mi(ints, right_idx, max_idx)
 
     # if mid_idx < ints[mid_idx]:
@@ -107,4 +107,19 @@ def magic_index(ints):
     return find_mi(ints, 0, len(ints) - 1)
 
 
-print(magic_index([2,2,3,4,6,6,6,8]))
+# print(magic_index([2,2,3,4,6,6,6,8]))
+
+
+def power_set(items):
+    """8.4"""
+    res_lst = []
+    for item in items:
+        for i in range(len(res_lst)):
+            res = res_lst[i]
+            res_lst.append({*res, item})
+
+        res_lst.append({item})
+    return res_lst
+
+
+# print(power_set({3, 4, 6}))
