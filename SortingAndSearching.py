@@ -39,10 +39,77 @@ def group_anagrams(words: list) -> None:
         for anagram in anagrams:
             words[p] = anagram
             p += 1
-    print('done')
 
 
 # w = ['abdc', 'hey', 'asasas', 'eyh', 'bacd']
 # group_anagrams(w)
 # print(w)
 
+
+def sra(items: list, item: int, low: int, high: int) -> int:
+    """10.3 helper"""
+    if low > high:
+        return -1
+
+    mid_idx = (high + low) // 2
+    if items[mid_idx] == item:
+        return mid_idx
+    if high == low:
+        return -1
+
+    if items[high] >= items[mid_idx + 1]:
+        if items[mid_idx + 1] <= item <= items[high]:
+            return sra(items, item, mid_idx + 1, high)
+        else:
+            return sra(items, item, low, mid_idx)
+    else:  # other range is ratzif items[low] <= items[mid_idx]
+        if items[low] <= item <= items[mid_idx]:
+            return sra(items, item, low, mid_idx)
+        else:
+            return sra(items, item, mid_idx + 1, high)
+
+
+def search_in_rotated_array(items: list, item: int) -> int:
+    """10.3"""
+    if items is None or len(items) == 0:
+        return -1
+    return sra(items, item, 0, len(items)-1)
+
+
+# print(search_in_rotated_array([15, 16, 19, 20, 25, 1, 3, 4, 5, 7, 10, 14], 160))
+# print(search_in_rotated_array([2, 2, 2, 3, 3, 4, 2], 2))
+
+
+def binary_search(lst: list, x: int, low: int, high: int):
+    """10.4 helper"""
+    if low > high:
+        return -1
+    mid_idx = (low + high) // 2
+    mid_val = lst[mid_idx]
+    if x == mid_val:
+        return mid_idx
+    if x > mid_val != -1:
+        return binary_search(lst, x, mid_idx + 1, high)
+    else:
+        return binary_search(lst, x, low, mid_idx - 1)
+
+
+def listys(lst: list, x: int) -> int:
+    """10.4"""
+    if lst[0] == -1:
+        return -1
+    low = 0
+    high = 1
+    found_range = False
+    while not found_range:
+        if lst[high] == -1 or lst[high] >= x:
+            found_range = True
+        else:
+            low = high
+            high *= 2
+
+    return binary_search(lst, x, low, high)
+
+
+test = [0, 2, 2, 4, 7, 21, 22, 32, 43, 45, 47, 47, 47, 50, -1, -1, -1, -1, -1, -1]
+print(listys(test, 460))
