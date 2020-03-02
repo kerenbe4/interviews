@@ -19,7 +19,30 @@ def sorted_merge(a: list, b: list):
         p_idx -= 1
 
 
-c = [1, 1, 7, 10, 12, None, None]
-d = [1, 2]
-sorted_merge(c, d)
-print(c)
+# c = [1, 1, 7, 10, 12, None, None]
+# d = [1, 2]
+# sorted_merge(c, d)
+# print(c)
+
+
+def group_anagrams(words: list) -> None:
+    """10.2"""
+    buckets = {}
+    for word in words:
+        sorted_word = ''.join(sorted(word))
+        if sorted_word not in buckets.keys():
+            buckets[sorted_word] = []
+        buckets[sorted_word].append(word)
+
+    p = 0
+    for bucket, anagrams in buckets.items():
+        for anagram in anagrams:
+            words[p] = anagram
+            p += 1
+    print('done')
+
+
+# w = ['abdc', 'hey', 'asasas', 'eyh', 'bacd']
+# group_anagrams(w)
+# print(w)
+
