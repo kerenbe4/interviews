@@ -111,5 +111,51 @@ def listys(lst: list, x: int) -> int:
     return binary_search(lst, x, low, high)
 
 
-test = [0, 2, 2, 4, 7, 21, 22, 32, 43, 45, 47, 47, 47, 50, -1, -1, -1, -1, -1, -1]
-print(listys(test, 460))
+# test = [0, 2, 2, 4, 7, 21, 22, 32, 43, 45, 47, 47, 47, 50, -1, -1, -1, -1, -1, -1]
+# print(listys(test, 460))
+
+
+def sbs(strings: list, word: str, low: int, high: int) -> int:
+    """10.5 helper"""
+    if low > high:
+        return -1
+    mid_idx = (low + high) // 2
+    mid_val = strings[mid_idx]
+    upper_bound = mid_idx
+    lower_bound = mid_idx
+    if mid_val == '':
+        upper_bound += 1
+        lower_bound -= 1
+        found = False
+        while not found:
+            if upper_bound > high and lower_bound < low:
+                return -1
+            if upper_bound <= high and strings[upper_bound] != '':
+                mid_idx = upper_bound
+                lower_bound += 1
+                found = True
+            elif lower_bound >= low and strings[lower_bound] != '':
+                mid_idx = lower_bound
+                found = True
+            else:
+                upper_bound += 1
+                lower_bound -= 1
+    mid_val = strings[mid_idx]
+    if mid_val == word:
+        return mid_idx
+    if mid_val > word:
+        return sbs(strings, word, low, lower_bound - 1)
+
+    else:
+        return sbs(strings, word, upper_bound + 1, high)
+
+
+def sparse_search(strings: list, word: str) -> int:
+    """10.5"""
+    if strings is None or len(strings) == 0 or word is None or word == '':
+        return -1
+    return sbs(strings, word, 0, len(strings)-1)
+
+
+# print(sparse_search(['', 'as', '', '', 'aa'], 'as'))
+print(sparse_search(['at', '', '', '', 'ball', '', '', 'car', '', '', 'dad', '', ''], 'at'))
