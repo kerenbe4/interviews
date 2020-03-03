@@ -67,7 +67,7 @@ def triple_steps(steps):
 # triple_steps(5)
 
 
-def find_mi(ints, min_idx, max_idx):
+def find_mi(ints: list, min_idx: int, max_idx: int) -> int:
     """8.3 helper"""
     print(f'min: {min_idx}, max: {max_idx}')
     if min_idx > max_idx:
@@ -100,7 +100,7 @@ def find_mi(ints, min_idx, max_idx):
     #     return find_mi(ints, min_idx, ints[mid_idx])
 
 
-def magic_index(ints):
+def magic_index(ints: list):
     """8.3"""
     if ints is None or len(ints) == 0:
         return -1
@@ -110,7 +110,7 @@ def magic_index(ints):
 # print(magic_index([2,2,3,4,6,6,6,8]))
 
 
-def power_set(items):
+def power_set(items: set) -> list:
     """8.4"""
     res_lst = []
     for item in items:
@@ -123,3 +123,72 @@ def power_set(items):
 
 
 # print(power_set({3, 4, 6}))
+
+
+def permutations_without_dups(string: str) -> list:
+    """8.7"""
+    if string is None or len(string) == 0:
+        return []
+
+    res = [[string[-1]]]
+    for c in range(len(string) - 1):
+        char = string[c]
+        new_res = []
+        for partial_result in res:
+            for j in range(len(partial_result) + 1):
+                new_p = partial_result.copy()
+                new_p.insert(j, char)
+                new_res.append(new_p)
+        res = new_res
+
+    result = []
+    for char_arr in res:
+        result.append(''.join(char_arr))
+    return result
+
+
+# t = permutations_without_dups('adcb')
+# print(t)
+# print(set(t))
+# print(len(t))
+
+
+def perm(chars: dict) -> list:
+    """8.8 helper"""
+    print('perm')
+    if len(chars) == 0:
+        return ['']
+
+    all_permutations = []
+    for char in chars:
+        print('char: ', char)
+        new_charset = chars.copy()
+        if new_charset[char] == 1:
+            del new_charset[char]
+        else:
+            new_charset[char] -= 1
+        permutations_no_c = perm(new_charset)
+        permutations_w_c = []
+        for p in permutations_no_c:
+            permutations_w_c.append(char + p)
+
+        for permut in permutations_w_c:
+            all_permutations.append(permut)
+
+    return all_permutations
+
+
+def permutations_with_dups(string: str) -> list:
+    """8.8"""
+    if string is None or len(string) == 0:
+        return []
+    chars = {}
+    for s in string:
+        if s not in chars.keys():
+            chars[s] = 0
+        chars[s] += 1
+
+    return perm(chars)
+
+
+print(permutations_with_dups('abc'))
