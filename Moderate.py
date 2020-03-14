@@ -387,3 +387,51 @@ def sub_sort(nums: list) -> tuple:
 # print(sub_sort([0, 1, 2, 3, 4, 5, 7, 6, 8, 9]))
 # print(sub_sort([7, 8, 9, 10, 3, 4, 5, 6]))
 # print(sub_sort([1, 2, 4, 7, 10, 11, 7, 12, 6, 7, 16, 18, 19]))
+
+
+def get_pond_size(matrix: list, column: int, row: int) -> int:
+    """16.19 helper"""
+    if column >= len(matrix) or row >= len(matrix[0]):
+        return 0
+    pond_size = 0
+    cell = matrix[column][row]
+    if cell == 0:
+        matrix[column][row] = None
+        pond_size += 1
+
+        # for each one of the neighbors - get pond size
+        pond_size += get_pond_size(matrix, column + 1, row)
+        for i in range(-1, 2, 1):
+            pond_size += get_pond_size(matrix, column + i, row + 1)
+
+    return pond_size
+
+
+def pond_sizes(matrix: list) -> list:
+    """16.19"""
+    ponds = []
+    rows = len(matrix[0])
+    columns = len(matrix)
+
+    # scanning all cells
+    for row_idx in range(rows):
+        for column_idx in range(columns):
+
+            cell = matrix[column_idx][row_idx]
+            if cell == 0:
+                new_pond_size = get_pond_size(matrix, column_idx, row_idx)
+                ponds.append(new_pond_size)
+
+    return ponds
+
+
+# cola = [0, 0, 1, 0]
+# colb = [2, 1, 1, 1]
+# colc = [1, 0, 0, 0]
+# cold = [0, 1, 1, 1]
+# print(pond_sizes([cola, colb, colc, cold]))
+# cole = [0, 1, 0, 0]
+# colf = [1, 0, 1, 2]
+# colg = [2, 3, 0, 0]
+# colh = [1, 0, 1, 1]
+# print(pond_sizes([cole, colf, colg, colh]))
