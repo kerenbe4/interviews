@@ -191,4 +191,78 @@ def permutations_with_dups(string: str) -> list:
     return perm(chars)
 
 
-print(permutations_with_dups('abc'))
+# print(permutations_with_dups('abc'))
+
+
+def p(close: int, opens: int, prefix: str):
+    """8.9 helper"""
+    if close == 0 and opens == 0:
+        print(prefix)
+        return
+    if opens > 0:
+        p(close, opens - 1, prefix + '(')
+    if opens < close:
+        p(close - 1, opens, prefix + ')')
+
+
+def parentheses(n: int):
+    """8.9"""
+    if n < 1:
+        return
+    p(n, n, '')
+
+
+# parentheses(4)
+
+def pf(screen: list, x, y, new_color, old_color):
+    """8.10 helper"""
+    if x < 0 or y < 0 or y > len(screen[0]) - 1 or x > len(screen) - 1 or screen[x][y] != old_color:
+        return
+
+    old_color = screen[x][y]
+    screen[x][y] = new_color
+    for i in range(-1, 2, 1):
+        for j in range(-1, 2, 1):
+            pf(screen, x + i, y + j, new_color, old_color)
+
+
+def paint_fill(screen: list, x, y, new_color):
+    """8.10"""
+    pf(screen, x, y, new_color, screen[x][y])
+
+
+# col1 = ['b', 'w', 'w']
+# col2 = ['b', 'w', 'w']
+# col3 = ['w', 'w', 'w']
+# s = [col1, col2]
+# paint_fill(s, 0, 1, 'g')
+# print(s)
+
+
+def c(n: int, coins: list, max_coins_idx: int, memo: dict) -> int:
+    if max_coins_idx < 0:
+        return 0
+    if max_coins_idx == 0 or 0 <= n < 5:
+        return 1
+    if (n, max_coins_idx) in memo:
+        return memo[(n, max_coins_idx)]
+
+    total_combinations = 0
+    max_coin = coins[max_coins_idx]
+    res = n // max_coin
+    for i in range(res + 1):
+        total_combinations += c(n - i * max_coin, coins, max_coins_idx - 1, memo)
+
+    memo[(n, max_coins_idx)] = total_combinations
+    return total_combinations
+
+
+def coins_options(n: int) -> int:
+    """8.11"""
+    if n < 0:
+        return -1
+    memo = {}
+    return c(n, [1, 5, 10, 25], 3, memo)
+
+
+print(coins_options(100))
