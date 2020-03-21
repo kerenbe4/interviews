@@ -265,4 +265,84 @@ def coins_options(n: int) -> int:
     return c(n, [1, 5, 10, 25], 3, memo)
 
 
-print(coins_options(100))
+# print(coins_options(100))
+
+class Cell:
+    """8.12 helper"""
+    def __init__(self, row, column):
+        self.row = row
+        self.column = column
+
+
+def is_valid_placement(row: int, column: int, placements: list) -> bool:
+    """8.12 helper"""
+    # For each placement, check row, col and diagonals
+    for cell in placements:
+        if cell.row == row or cell.column == column:
+            return False
+        for i in range(1, 8, 1):
+            if (cell.row - i == row and cell.column - i == column) or (cell.row - i == row and cell.column + i == column) or (cell.row + i == row and cell.column -i == column) or (cell.row + i == row and cell.column + i == column):
+                return False
+
+    return True
+
+
+def eq(placements: list, row: int, res: list):
+    """8.12 helper"""
+    if row == 8:
+        res.append(placements)
+        return
+
+    for column in range(8):
+        if is_valid_placement(row, column, placements):
+            pm = placements.copy()
+            pm.append(Cell(row, column))
+            eq(pm, row + 1, res)
+
+
+def eight_queens():
+    """8.12"""
+    res = []
+    return eq([], 0, res)
+
+
+# eight_queens()
+
+
+class Box:
+    """8.13 helper"""
+    def __init__(self, w, h, d):
+        self.w = w
+        self.h = h
+        self.d = d
+
+    def can_stack(self, other) -> bool:
+        return self.w >= other.w and self.h >= other.h and self.d >= other.d
+
+
+def sob_recurse(boxes: list, stack_height: int, current_box_idx: int, top_box: int) -> int:
+    """8.13 helper"""
+    if current_box_idx == len(boxes):
+        return stack_height
+    maximum = sob_recurse(boxes, stack_height, current_box_idx + 1, top_box)
+    if top_box == -1 or boxes[top_box].can_stack(boxes[current_box_idx]):
+        maximum = max(maximum, sob_recurse(boxes, stack_height + boxes[current_box_idx].h, current_box_idx + 1, current_box_idx))
+
+    return maximum
+
+
+def stack_of_boxes(boxes: list) -> int:
+    """8.13"""
+    if boxes is None or len(boxes) == 0:
+        return 0
+    boxes.sort(key=lambda box: box.w, reverse=True)
+    return sob_recurse(boxes, 0, 0, -1)
+
+
+b = [
+    Box(5, 6, 7),
+    Box(1, 3, 3),
+    Box(8, 4, 1)
+]
+# print(stack_of_boxes(b))
+print(stack_of_boxes(b))
