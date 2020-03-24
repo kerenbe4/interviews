@@ -1,8 +1,8 @@
 from typing import List
 
 
+"""Given an array with non-negative numbers, and a number x, check if there is a subarray that sums to x"""
 def is_subarray(nums: List[int], x: int) -> bool:
-    """Given an array with non-negative numbers, and a number x, check if there is a subarray that sums to x"""
     if nums is None or len(nums) == 0 or x < 0:
         return False
 
@@ -28,8 +28,10 @@ def is_subarray(nums: List[int], x: int) -> bool:
 # print(is_subarray([3], 8))
 # print(is_subarray([1, 3, 4, 9], 8))
 # print(is_subarray([1, 2, 7, 8], 8))
+# ------------------------------------------------------------------------------------
 
 
+"""Given a number x, calc the next bigger number with the same digits. (123->132)"""
 def get_new_num(digits: List[int]) -> List[int]:
     """helper for next_big"""
     # find the smallest digit bigger than the last one
@@ -48,7 +50,6 @@ def get_new_num(digits: List[int]) -> List[int]:
 
 
 def next_big(x: int) -> int:
-    """Given a number x, calc the next bigger number with the same digits. (123->132)"""
     if x // 10 == 0:
         return -1
 
@@ -79,4 +80,50 @@ def next_big(x: int) -> int:
 # print(next_big(32))
 # print(next_big(432))
 # print(next_big(1234))
+# ------------------------------------------------------------------------------------
 
+"""
+You want to move a note around the classroom. 
+Moving it sideways (between columns) will have 90% to get caught on the first row, 45% on second row etc. 
+Moving the note back/forth will have 50% to get caught on the first-second row, 25% on the second-third row etc.
+"""
+class Seat:
+    def __init__(self, column, row):
+        self.row = row
+        self.column = column
+
+
+class Move:
+    def __init__(self, orig, to):
+        self.orig = orig
+        self.to = to
+
+    def is_sideways(self) -> bool:
+        return self.orig.column != self.to.column
+
+
+def get_success_prob(get_caught_prob: list, row) -> float:
+    if row >= len(get_caught_prob):
+        for i in range(row - len(get_caught_prob) + 1):
+            get_caught_prob.append(get_caught_prob[-1] / 2)
+
+    return 1 - get_caught_prob[row]
+
+
+def pass_note_chance(moves: List[Move]) -> float:
+    prob = 1
+    sideways_caught_prob = [0.9, 0.45]
+    back_caught_prob = [0.5, 0.25]
+
+    for move in moves:
+        if move.is_sideways():
+            prob *= get_success_prob(sideways_caught_prob, move.orig.row)
+        else:
+            prob *= get_success_prob(back_caught_prob, min(move.orig.row, move.to.row))
+
+    return prob
+
+
+# print(pass_note_chance([Move(Seat(0, 2), Seat(0, 1)), Move(Seat(0, 1), Seat(1, 1)), Move(Seat(1, 1), Seat(1, 0)), Move(Seat(1, 0), Seat(2, 0))]))
+# print(pass_note_chance([Move(Seat(0, 2), Seat(1, 2))]))
+# ------------------------------------------------------------------------------------
