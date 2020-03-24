@@ -1,5 +1,4 @@
-from typing import List
-
+from typing import List, Tuple, Set
 
 """Given an array with non-negative numbers, and a number x, check if there is a subarray that sums to x"""
 def is_subarray(nums: List[int], x: int) -> bool:
@@ -127,3 +126,66 @@ def pass_note_chance(moves: List[Move]) -> float:
 # print(pass_note_chance([Move(Seat(0, 2), Seat(0, 1)), Move(Seat(0, 1), Seat(1, 1)), Move(Seat(1, 1), Seat(1, 0)), Move(Seat(1, 0), Seat(2, 0))]))
 # print(pass_note_chance([Move(Seat(0, 2), Seat(1, 2))]))
 # ------------------------------------------------------------------------------------
+
+
+"""Build a function that returns a valid sudoku board. """
+def get_min_max_of_box(x: int) -> Tuple[int, int]:
+    if x <= 2:
+        return 0, 2
+    if x >= 6:
+        return 6, 8
+    return 3, 5
+
+
+def get_available_options(board: List[List[int]], row: int, column: int) -> Set[int]:
+    options = {1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+    for i in range(9):
+        options.discard(board[column][i])
+        options.discard(board[i][row])
+
+    row_min, row_max = get_min_max_of_box(row)
+    col_min, col_max = get_min_max_of_box(column)
+
+    for c in range(col_min, col_max + 1, 1):
+        for r in range(row_min, row_max + 1, 1):
+            options.discard(board[c][r])
+
+    return options
+
+
+def get_next_cell(row: int, column: int) -> Tuple[int, int]:
+    if column == 8:
+        return row + 1, 0
+    else:
+        return row, column + 1
+
+
+def fill_sudoku_board(board: List[List[int]], row: int, column: int) -> Tuple[bool, List[List[int]]]:
+    options = get_available_options(board, row, column)
+    if len(options) == 0:
+        return False, board
+    if row == 8 and column == 8:
+        board[column][row] = next(iter(options))
+        return True, board
+
+    # can possibly shuffle set results to gt a random board
+    for option in options:
+        board[column][row] = option
+        n_row, n_col = get_next_cell(row, column)
+        is_valid, b = fill_sudoku_board(board, n_row, n_col)
+        if is_valid:
+            return True, b
+        else:
+            board[column][row] = 0
+
+    return False, board
+
+
+def build_sudoku_board() -> List[List[int]]:
+    empty_board = [[0]*9 for _ in range(9)]
+    _, board = fill_sudoku_board(empty_board, 0, 0)
+    return board
+
+
+print(build_sudoku_board())
