@@ -200,3 +200,29 @@ def bi_node(root: BiNode) -> BiNode:
 # while res is not None:
 #     print(res.data)
 #     res = res.node1
+
+
+def m(appointments: list, appointment_idx: int, memo: dict) -> int:
+    """17.16 helper"""
+    if appointment_idx >= len(appointments):
+        return 0
+    if appointment_idx in memo:
+        return memo[appointment_idx]
+
+    time_with_app = appointments[appointment_idx] + m(appointments, appointment_idx + 2, memo)
+    time_without_app = m(appointments, appointment_idx + 1, memo)
+
+    memo[appointment_idx] = max(time_with_app , time_without_app)
+    return memo[appointment_idx]
+
+
+def masseuse(appointments: list) -> int:
+    """17.16"""
+    if appointments is None or len(appointments) == 0:
+        return 0
+    memo = {}
+    return m(appointments, 0, memo)
+
+
+# p = [30, 15, 60, 75, 45, 15, 15, 45]
+# print(masseuse(p))
