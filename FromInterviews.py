@@ -1,6 +1,9 @@
 from typing import List, Tuple, Set
 
-"""Given an array with non-negative numbers, and a number x, check if there is a subarray that sums to x"""
+"""
+Facebook mock interview by Chani Shubin for Eden:
+Given an array with non-negative numbers, and a number x, check if there is a subarray that sums to x
+"""
 def is_subarray(nums: List[int], x: int) -> bool:
     if nums is None or len(nums) == 0 or x < 0:
         return False
@@ -30,7 +33,10 @@ def is_subarray(nums: List[int], x: int) -> bool:
 # ------------------------------------------------------------------------------------
 
 
-"""Given a number x, calc the next bigger number with the same digits. (123->132)"""
+"""
+Facebook screening interview for Eden:
+Given a number x, calc the next bigger number with the same digits. (123->132)
+"""
 def get_new_num(digits: List[int]) -> List[int]:
     """helper for next_big"""
     # find the smallest digit bigger than the last one
@@ -82,6 +88,7 @@ def next_big(x: int) -> int:
 # ------------------------------------------------------------------------------------
 
 """
+Google screening interview for Eden:
 You want to move a note around the classroom. 
 Moving it sideways (between columns) will have 90% to get caught on the first row, 45% on second row etc. 
 Moving the note back/forth will have 50% to get caught on the first-second row, 25% on the second-third row etc.
@@ -128,7 +135,11 @@ def pass_note_chance(moves: List[Move]) -> float:
 # ------------------------------------------------------------------------------------
 
 
-"""Build a function that returns a valid sudoku board. """
+"""
+Google screening interview for Eden:
+Build a function that returns a valid sudoku board.
+"""
+
 def get_min_max_of_box(x: int) -> Tuple[int, int]:
     if x <= 2:
         return 0, 2
@@ -169,7 +180,7 @@ def fill_sudoku_board(board: List[List[int]], row: int, column: int) -> Tuple[bo
         board[column][row] = next(iter(options))
         return True, board
 
-    # can possibly shuffle set results to gt a random board
+    # can possibly shuffle set results to get a random board
     for option in options:
         board[column][row] = option
         n_row, n_col = get_next_cell(row, column)
@@ -188,4 +199,48 @@ def build_sudoku_board() -> List[List[int]]:
     return board
 
 
-print(build_sudoku_board())
+# print(build_sudoku_board())
+# ------------------------------------------------------------------------------------
+
+
+"""
+Mock interview with Dina Goldshtein for Keren
+there is a 'world' witch is represented as a grid, with bikes and people, such that #b >= #p. 
+you need to match the people to bikes, in a way that every person will want to take the closest bike near him
+(if for example p1 is closer to b1 than p2, so p1 will match b1, and p2 will be matched to a different bike 
+"""
+class Point:
+    def __init__(self, row, column):
+        self.row = row
+        self.column = column
+
+
+class Match:
+    def __init__(self, person, bike, distance):
+        self.person = person
+        self.bike = bike
+        self.distance = distance
+
+
+def best_match(bikes: List[Point], people: List[Point]) -> List[Match]:
+    people_bikes_all = []
+    for p in people:
+        for b in bikes:
+            d = abs(p.row - b.row) + abs(p.column - b.column)
+            people_bikes_all.append(Match(p, b, d))
+
+    people_bikes_all.sort(key=lambda potential_match: potential_match.distance)
+
+    used_bikes = set()
+    used_people = set()
+    result_matches = []
+
+    for match in people_bikes_all:
+        if match.person not in used_people and match.bike not in used_bikes:
+            used_bikes.add(match.bike)
+            used_people.add(match.person)
+            result_matches.append(match)
+            if len(used_people) == len(people):
+                return result_matches
+
+    return result_matches
