@@ -1,4 +1,5 @@
 from typing import List, Tuple, Set
+from Cracking.StacksAndQueues import Queue
 
 """
 Facebook mock interview by Chani Shubin for Eden:
@@ -244,3 +245,293 @@ def best_match(bikes: List[Point], people: List[Point]) -> List[Match]:
                 return result_matches
 
     return result_matches
+# ------------------------------------------------------------------------------------
+
+
+"""
+Google interview, long day, Keren 2017
+Given 2 people, determine if they have a common ancestor (or if they are related, not sure)
+"""
+class Person:
+    def __init__(self, parents, children):
+        self.parents = parents
+        self.children = children
+        self.visited = False
+
+
+def have_common_ancestor(person1: Person, person2: Person) -> bool:
+    if person1 is None or person2 is None:
+        return False
+    if person1 is person2:
+        return True
+
+    q = Queue()
+    person1.visited = True
+    person2.visited = True
+    q.add(person1)
+    q.add(person2)
+
+    while not q.is_empty():
+        p = q.remove()
+        for parent in p.parents:
+            if parent.visited:
+                return True
+            else:
+                parent.visited = True
+                q.add(parent)
+
+    return False
+# ------------------------------------------------------------------------------------
+
+
+"""
+Google interview, long day, Keren 2017
+You have a game of 2 players: there is a line of gold bags, with different amount of gold in them.
+each player in his turn, can choose to select one of the outer bags of the line. 
+can the first player win?
+"""
+def play_move(coins: List[int], first_idx: int, last_idx: int, is_first_player_turn: bool, suma: int, sumb: int) -> bool:
+    # 1 item left - indices are same
+    if first_idx == last_idx:
+        if is_first_player_turn:
+            suma += coins[first_idx]
+        else:
+            sumb += coins[first_idx]
+        return True if suma > sumb else False
+
+    # more than 1 item - 2 options
+    if is_first_player_turn:
+        new_suma = suma + coins[first_idx]
+        new_sumb = sumb
+    else:
+        new_sumb = sumb + coins[first_idx]
+        new_suma = suma
+    first_coin_bag = play_move(coins, first_idx + 1, last_idx, not is_first_player_turn, new_suma, new_sumb)
+    if first_coin_bag:
+        return True
+
+    if is_first_player_turn:
+        new_suma = suma + coins[last_idx]
+        new_sumb = sumb
+    else:
+        new_sumb = sumb + coins[last_idx]
+        new_suma = suma
+
+    last_coin_bag = play_move(coins, first_idx, last_idx - 1, not is_first_player_turn, new_suma, new_sumb)
+    return last_coin_bag
+
+
+def golden_coins_game(coins: List[int]) -> bool:
+    if coins is None or len(coins) == 0:
+        return True
+    if len(coins) == 1 or len(coins) == 2:
+        return True
+
+    return play_move(coins, 0, len(coins) - 1, True, 0, 0)
+
+
+# print(golden_coins_game([5]))
+# print(golden_coins_game([5, 10]))
+# print(golden_coins_game([5, 10, 3])) <<<<------
+# print(golden_coins_game([5, 10, 6]))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Mock interview with Eliraz Levi for Keren
+given an array with numbers and a number k, determine if there are 3 numbers in the array that sums up to k.  
+
+note, that the sum2 problem is usually solved for an unsorted array in o(n) time and o(n) space. here we have the array 
+sorted, and we can utilize that to an o(n) time and o(1) space.
+"""
+def sum2(nums: List[int], k: int, pivot_idx: int) -> bool:
+    low_idx = pivot_idx + 1
+    high_idx = len(nums) - 1
+
+    while low_idx < high_idx:
+        current_sum = nums[low_idx] + nums[high_idx]
+        if current_sum == k:
+            return True
+        if current_sum > k:
+            high_idx -= 1
+        else:
+            low_idx += 1
+    return False
+
+
+def sum3(nums: List[int], k: int) -> bool:
+    if nums is None or len(nums) < 3:
+        return False
+
+    nums.sort()
+    for i in range(len(nums)):
+        res = sum2(nums, k-nums[i], i)
+        if res:
+            return True
+
+    return False
+
+# ------------------------------------------------------------------------------------
+
+
+"""
+Mock interview with Romi Gelman for Keren
+Given a list of couples of synonyms, and 2 sentences, determine if the sentences are the same.
+example: synonyms: [(movie, film), (rating, score)]
+sentence1: The rating of the film was good
+sentence1: The score of the movie was good
+"""
+
+
+def are_syno_words(word_a: str, word_b: str, syno_set: Set[str]) -> bool:
+    key = word_a + ' ' + word_b
+    if key in syno_set:
+        return True
+
+    key = word_b + ' ' + word_a
+    if key in syno_set:
+        return True
+
+    return False
+
+
+def is_syno(sent_a: str, sent_b: str, syno: List[Tuple[str, str]]) -> bool:
+    syno_words = set()
+    for words in syno:
+        syno_words.add(words[0] + ' ' + words[1])
+
+    # split sentence into words
+    s1 = sent_a.split(' ')
+    s2 = sent_b.split(' ')
+
+    if len(s1) != len(s2):
+        return False
+    # iterate over both, and compare
+    for i in range(len(s1)):
+        if s1[i] != s2[i]:
+            if not are_syno_words(s1[i], s2[i], syno_words):
+                return False
+
+    return True
+
+
+# s = [('movie', 'film'), ('rating', 'score')]
+# sen1 = 'The rating of the film was good'
+# sen2 = 'The score of the movie was good'
+# print(is_syno(sen1, sen2, s))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Google screening interview from Doron's file (#9)
+You have a matrix of booleans, False-sea, True-land. if the land doesn't touch the frame of the matrix it's an island
+Write a function that receives a matrix and removes all the islands. 
+"""
+def is_island(land: List[List[bool]], m: int, n: int) -> bool:
+    if m == len(land)-1 or n == len(land[0])-1:
+        return False
+
+    for i in [-1, 1]:
+        for j in [-1, 1]:
+            if land[m + i][n + j]:
+                if not is_island(land, m + i, n + j):
+                    return False
+
+    return True
+
+
+def remove_island(land: List[List[bool]], m: int, n: int):
+    if not land[m][n]:
+        return
+    land[m][n] = False
+    for i in [-1, 1]:
+        for j in [-1, 1]:
+            remove_island(land, m + i, n + j)
+
+
+def find_and_remove_islands(land: List[List[bool]]):
+    m = len(land)
+    n = len(land[0])
+
+    for i in range(1, m - 1, 1):
+        for j in range(1, n - 1, 1):
+            if land[i][j] and not land[i - 1][j] and not land[i][j - 1]:
+                if is_island(land, i, j):
+                    remove_island(land, i, j)
+
+
+# a = [False, False, False, True, True]
+# b = [False, True, False, False, True]
+# c = [False, False, False, True, True]
+# d = [False, False, False, True, False]
+# e = [False, False, False, False, False]
+# matrix = [a, b, c, d, e]
+# find_and_remove_islands(matrix)
+# print(matrix)
+# ------------------------------------------------------------------------------------
+
+
+"""
+Google screening interview from Doron's file (#10)
+you have a pizza of n slices with olives on it. each slice with a different amount of olives
+what is the maximum olives you can have, if you can't select 2 adjacent slices?
+"""
+def calc_max_olives(olives: List[int], idx: int, can_use_last_slice: int, memo: dict) -> int:
+    """recursive solution helper"""
+    if idx > len(olives) - 1:
+        return 0
+
+    if idx == len(olives) - 1:
+        return olives[-1] if can_use_last_slice else 0
+
+    if idx in memo:
+        return memo[idx]
+
+    use_slice = olives[idx] + calc_max_olives(olives, idx + 2, can_use_last_slice, memo)
+    not_use_slice = calc_max_olives(olives, idx + 1, can_use_last_slice, memo)
+
+    memo[idx] = max(use_slice, not_use_slice)
+    return memo[idx]
+
+
+def max_olives_on_pizza_rec(olives: List[int]) -> int:
+    """recursive solution"""
+    if olives is None or len(olives) == 0:
+        return 0
+
+    memo_first_used = {}
+    memo_first_not_used = {}
+    with_first_slice = olives[0] + calc_max_olives(olives, 2, False, memo_first_used)
+    without_first_slice = calc_max_olives(olives, 1, True, memo_first_not_used)
+    return max(with_first_slice, without_first_slice)
+
+
+def max_olives_on_pizza(olives: List[int]) -> int:
+    if olives is None or len(olives) == 0:
+        return 0
+
+    last_one_with = olives[-1]
+    last_two_with = 0
+    last_one_without = 0
+    last_two_without = 0
+
+    # with is with the last one
+    sum_with = olives[-1]
+    sum_without = 0
+    for i in range(len(olives) - 2, 0, -1):
+        sum_with = max(olives[i] + last_two_with, last_one_with)
+        sum_without = max(olives[i] + last_two_without, last_one_without)
+        last_two_with = last_one_with
+        last_one_with = sum_with
+        last_two_without = last_one_without
+        last_one_without = sum_without
+
+    sum_without = max(olives[0] + last_two_without, last_one_without)
+    result = max(sum_without, sum_with)
+    return result
+
+
+olivess = [3, 7, 6, 1, 1, 10]
+print(max_olives_on_pizza(olivess))
+print(max_olives_on_pizza_rec(olivess))
+
