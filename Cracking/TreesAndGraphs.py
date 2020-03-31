@@ -1,4 +1,4 @@
-from StacksAndQueues import Stack, Queue
+from Cracking.StacksAndQueues import Stack, Queue
 
 
 class Node:
