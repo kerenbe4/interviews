@@ -59,3 +59,11 @@ class Person:
 # Then there are class methods (using @classmethod) which have a reference to the class object as cls.
 # And finally there are static methods (declared with @staticmethod) which have neither of those references.
 # Static methods are just like functions at module level, except they live in the class' name space
+
+
+# sort of a list with class elements, and sorting by their member
+my_list.sort(key=lambda p: p.ht)
+
+# copy a 2d list
+a = [[1, 2], [3, 4]]
+b = [x[:] for x in a]
