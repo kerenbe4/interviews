@@ -1,3 +1,4 @@
+import math
 from typing import List, Tuple, Set
 from Cracking.StacksAndQueues import Queue
 
@@ -531,7 +532,166 @@ def max_olives_on_pizza(olives: List[int]) -> int:
     return result
 
 
-olivess = [3, 7, 6, 1, 1, 10]
-print(max_olives_on_pizza(olivess))
-print(max_olives_on_pizza_rec(olivess))
+# olivess = [3, 7, 6, 1, 1, 10]
+# print(max_olives_on_pizza(olivess))
+# print(max_olives_on_pizza_rec(olivess))
+# ------------------------------------------------------------------------------------
 
+
+"""
+Google screening interview from Doron's file (#7)
+We define an alternative syntax for an arithmetic expression:
+operator = + | *
+expression = number | (operator expression+)
+here are examples of valid expressions and their arithmetic value:
+(+ 2 13) -> (2 + 13) -> 15
+(+1(*2 3)4) -> (1 + (2 * 3) + 4) -> 11
+412 -> 412
+write a program that receives a valid expression as an input and returns its arithmetic value.
+"""
+def resolve_number(str_exp: str, idx: int) -> Tuple[int, int]:
+    tmp_lst = []
+    while idx < len(str_exp) and str_exp[idx] not in [' ', ')', '*', '+', '(']:
+        tmp_lst.append(str_exp[idx])
+        idx += 1
+
+    value = 0
+    mul = 1
+    for i in range(len(tmp_lst) - 1, -1, -1):
+        value += mul * int(tmp_lst[i])
+        mul *= 10
+    return value, idx
+
+
+def resolve_expression(str_exp: str, idx: int) -> Tuple[int, int]:
+    is_sum = True if str_exp[idx] == '+' else False
+    values = []
+
+    new_idx = idx + 1
+    while not str_exp[new_idx] == ')':
+        if str_exp[new_idx] == '(':
+            value, new_idx = resolve_expression(str_exp, new_idx + 1)
+            values.append(value)
+        elif str_exp[new_idx] == ' ':
+            new_idx += 1
+        else:
+            value, new_idx = resolve_number(str_exp, new_idx)
+            values.append(value)
+
+    result = sum(values) if is_sum else math.prod(values)
+    return result, new_idx + 1
+
+
+def new_math(str_exp: str, idx: int) -> int:
+    if str_exp[idx] == '(':
+        value, _ = resolve_expression(str_exp, idx + 1)
+    else:
+        value, _ = resolve_number(str_exp, idx)
+
+    return value
+
+
+def new_math_main(str_exp: str) -> int:
+    if str_exp is None or len(str_exp) == 0:
+        return 0
+
+    res = new_math(str_exp, 0)
+    return res
+
+
+# print(new_math_main('412'))
+# print(new_math_main('(+ 2 13)'))
+# print(new_math_main('(+1(*2 3)4)'))
+# print(new_math_main('(+1(*2 3)(+5 6))'))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Facebook mock interview with Lior Saddan for Keren - Q1
+Given a list of words, return a list of lists grouping the words that are cezar code of each other
+'abc'  <-> 'bcd' <-> 'cde' <-> ... 'zab'
+f(['abc', 'bcd', 'bbb', 'eee', 'z']) -> [['abc', 'bcd'], ['bbb', 'eee'], ['z']]   cad -> ayb
+a-z, 97-123
+"""
+def get_rep_word(word: str) -> str:
+    """helper"""
+    gap = ord(word[0]) - 97
+    if gap == 0:
+        return word
+
+    new_word = []
+    for c in word:
+        n = ord(c) - gap
+        n = n + 26 if n < 97 else n
+        new_word.append(chr(n))
+    print(new_word)
+    return ''.join(new_word)
+
+
+def cezar_code(words: List[str]) -> List[List[str]]:
+    results = {}
+    for word in words:
+        rep = get_rep_word(word)
+        if rep not in results:
+            results[rep] = []
+        results[rep].append(word)
+
+    r = results.values()
+    return r
+
+
+# print(cezar_code(['abc', 'bcd', 'bbb', 'eee', 'z', 'cad', 'ayb']))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Facebook mock interview with Lior Saddan for Keren - Q2
+Given a sorted list of positive integers, with duplicates, and a number, return the amount of time that number 
+appear in the list. example: f([1, 1, 1, 2, 5, 7, 8, 8, 8, 8, 9, 14, 17, 21], 8) -> 4
+"""
+def find_max_idx(nums: List[int], start_idx: int, end_idx: int, num: int) -> int:
+    if start_idx > end_idx:
+        return -1
+
+    pivot_idx = (start_idx + end_idx) // 2
+    if nums[pivot_idx] > num:
+        return find_max_idx(nums, start_idx, pivot_idx - 1, num)
+    elif nums[pivot_idx] < num:
+        return find_max_idx(nums, pivot_idx + 1, end_idx, num)
+    else:
+        if pivot_idx == len(nums) - 1 or nums[pivot_idx + 1] > num:
+            return pivot_idx
+        else:
+            return find_max_idx(nums, pivot_idx + 1, end_idx, num)
+
+
+def find_min_idx(nums: List[int], start_idx: int, end_idx: int, num: int) -> int:
+    if start_idx > end_idx:
+        return -1
+
+    pivot_idx = (start_idx + end_idx) // 2
+    if nums[pivot_idx] > num:
+        return find_min_idx(nums, start_idx, pivot_idx - 1, num)
+    elif nums[pivot_idx] < num:
+        return find_min_idx(nums, pivot_idx + 1, end_idx, num)
+    else:
+        if pivot_idx == 0 or nums[pivot_idx - 1] < num:
+            return pivot_idx
+        else:
+            return find_min_idx(nums, start_idx, pivot_idx - 1, num)
+
+
+def find_scope(nums: List[int], num) -> int:
+    if nums is None or len(nums) == 0:
+        return 0
+
+    min_idx = find_min_idx(nums, 0, len(nums) - 1, num)
+    if min_idx == -1:
+        return 0
+
+    max_idx = find_max_idx(nums, 0, len(nums) - 1, num)
+    return max_idx - min_idx + 1
+
+
+# print(find_scope([1, 1, 1, 2, 5, 7, 8, 8, 8, 8, 9, 14, 17, 21], 1))
+# ------------------------------------------------------------------------------------
