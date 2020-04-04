@@ -152,10 +152,10 @@ def one_way(str1, str2):
     return True
 
 
-print(one_way('longggggggg', 'short'))
-print(one_way('short', 'longggggggg'))
-print(one_way('pale', 'ple'))
-print(one_way('pales', 'pale'))
-print(one_way('pale', 'bale'))
-print(one_way('pale', 'bake'))
+# print(one_way('longggggggg', 'short'))
+# print(one_way('short', 'longggggggg'))
+# print(one_way('pale', 'ple'))
+# print(one_way('pales', 'pale'))
+# print(one_way('pale', 'bale'))
+# print(one_way('pale', 'bake'))
 # -----------------------------------------------------------------------------
