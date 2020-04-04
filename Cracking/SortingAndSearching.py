@@ -1,3 +1,6 @@
+from typing import List
+
+
 def sorted_merge(a: list, b: list):
     """10.1"""
     p_idx = len(a) - 1
@@ -158,4 +161,45 @@ def sparse_search(strings: list, word: str) -> int:
 
 
 # print(sparse_search(['', 'as', '', '', 'aa'], 'as'))
-print(sparse_search(['at', '', '', '', 'ball', '', '', 'car', '', '', 'dad', '', ''], 'at'))
+# print(sparse_search(['at', '', '', '', 'ball', '', '', 'car', '', '', 'dad', '', ''], 'at'))
+
+
+def merge(arr: List[int], helper: List[int], start_idx: int, mid_idx: int, end_idx: int):
+    current = start_idx
+    left_p = start_idx
+    right_p = mid_idx + 1
+
+    for i in range(start_idx, end_idx + 1, 1):
+        helper[i] = arr[i]
+
+    while left_p <= mid_idx and right_p <= end_idx:
+        if helper[left_p] <= helper[right_p]:
+            arr[current] = helper[left_p]
+            left_p += 1
+        else:
+            arr[current] = helper[right_p]
+            right_p += 1
+        current += 1
+
+    for i in range(mid_idx - left_p + 1):
+        arr[current + i] = helper[left_p + i]
+
+
+def merge_sort(arr: List[int], helper: List[int], start_idx: int, end_idx: int):
+    if start_idx < end_idx:
+        mid = (start_idx + end_idx) // 2
+        merge_sort(arr, helper, start_idx, mid)
+        merge_sort(arr, helper, mid + 1, end_idx)
+        merge(arr, helper, start_idx, mid, end_idx)
+
+
+def merge_sort_main(arr: List[int]):
+    if arr is None or len(arr) == 0:
+        return
+    helper = arr[:]
+    merge_sort(arr, helper, 0, len(arr) - 1)
+
+
+# a = [3, 8, 1, 6, 0, 1, 2, 7]
+# merge_sort_main(a)
+# print(a)
