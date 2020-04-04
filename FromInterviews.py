@@ -291,61 +291,39 @@ You have a game of 2 players: there is a line of gold bags, with different amoun
 each player in his turn, can choose to select one of the outer bags of the line. 
 can the first player win?
 """
-def play_move(coins: List[int], first_idx: int, last_idx: int, is_first_player_turn: bool, suma: int, sumb: int) -> bool:
-    # 1 item left - indices are same
-    if first_idx == last_idx:
-        if is_first_player_turn:
-            suma += coins[first_idx]
-        else:
-            sumb += coins[first_idx]
-        return True if suma > sumb else False
-
-    # more than 1 item - 2 options
-    if is_first_player_turn:
-        new_suma = suma + coins[first_idx]
-        new_sumb = sumb
-    else:
-        new_sumb = sumb + coins[first_idx]
-        new_suma = suma
-    first_coin_bag = play_move(coins, first_idx + 1, last_idx, not is_first_player_turn, new_suma, new_sumb)
-    if first_coin_bag:
+def golden_coins(coins: List[int]) -> bool:
+    if coins is None or len(coins) in [0, 1, 2]:
         return True
 
-    if is_first_player_turn:
-        new_suma = suma + coins[last_idx]
-        new_sumb = sumb
-    else:
-        new_sumb = sumb + coins[last_idx]
-        new_suma = suma
+    games = [[0] * len(coins) for _ in range(len(coins))]
+    for i in range(len(coins)):
+        games[i][i] = coins[i]
 
-    last_coin_bag = play_move(coins, first_idx, last_idx - 1, not is_first_player_turn, new_suma, new_sumb)
-    return last_coin_bag
+    for i in range(1, len(coins), 1):
+        for j in range(0, len(coins)-i, 1):
+            game_begin_idx = j
+            game_end_idx = j + i
+            first_option = coins[game_begin_idx] - games[game_begin_idx + 1][game_end_idx]
+            second_option = coins[game_end_idx] - games[game_begin_idx][game_end_idx - 1]
+            games[game_begin_idx][game_end_idx] = max(first_option, second_option)
 
-
-def golden_coins_game(coins: List[int]) -> bool:
-    if coins is None or len(coins) == 0:
-        return True
-    if len(coins) == 1 or len(coins) == 2:
-        return True
-
-    return play_move(coins, 0, len(coins) - 1, True, 0, 0)
+    return games[0][-1] > 0
 
 
-# print(golden_coins_game([5]))
-# print(golden_coins_game([5, 10]))
-# print(golden_coins_game([5, 10, 3])) <<<<------
-# print(golden_coins_game([5, 10, 6]))
+# print(golden_coins([5, 10, 3]))
+# print(golden_coins([5, 10, 6]))
 # ------------------------------------------------------------------------------------
 
 
 """
 Mock interview with Eliraz Levi for Keren
-given an array with numbers and a number k, determine if there are 3 numbers in the array that sums up to k.  
-
-note, that the sum2 problem is usually solved for an unsorted array in o(n) time and o(n) space. here we have the array 
-sorted, and we can utilize that to an o(n) time and o(1) space.
+Given an array with numbers and a number k, determine if there are 3 numbers in the array that sums up to k.  
 """
 def sum2(nums: List[int], k: int, pivot_idx: int) -> bool:
+    """
+    The sum2 problem is usually solved for an unsorted array in o(n) time and o(n) space. here we have the array
+    sorted, and we can utilize that to an o(n) time and o(1) space, by scanning from both sides.
+    """
     low_idx = pivot_idx + 1
     high_idx = len(nums) - 1
 
@@ -366,12 +344,13 @@ def sum3(nums: List[int], k: int) -> bool:
 
     nums.sort()
     for i in range(len(nums)):
-        res = sum2(nums, k-nums[i], i)
-        if res:
+        if sum2(nums, k-nums[i], i):
             return True
 
     return False
 
+
+# print(sum3([1, 4, 3, 9, -1, 12, -5], 6))
 # ------------------------------------------------------------------------------------
 
 
