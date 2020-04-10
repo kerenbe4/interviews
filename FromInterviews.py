@@ -674,3 +674,34 @@ def find_scope(nums: List[int], num) -> int:
 
 # print(find_scope([1, 1, 1, 2, 5, 7, 8, 8, 8, 8, 9, 14, 17, 21], 1))
 # ------------------------------------------------------------------------------------
+
+
+"""
+Facebook screening interview with Orit Mussel
+Given a group of ints and an int k, return the number of subgroups such that s: min{s} + max{s} <= k
+Example: input: [4 2 5 7], k=8 => output: 5. ([4 2 5], [4 2], [2 5], [4], [2])
+"""
+
+
+def subgroup_count(nums: List[int], k: int) -> int:
+    if len(nums) == 0:
+        return 0
+
+    start_idx = 0
+    end_idx = len(nums) - 1
+    total_count = 0
+
+    nums.sort()
+
+    while start_idx <= end_idx:
+        if nums[start_idx] + nums[end_idx] <= k:
+            group_len = end_idx - start_idx + 1
+            total_count += pow(2, group_len - 1)
+            start_idx += 1
+        else:
+            end_idx -= 1
+
+    return total_count
+
+
+print(subgroup_count([4, 2, 5, 7], 8))
