@@ -3,6 +3,7 @@ Moderate - 16
 questions (book pages 181-185)
 solutions (book pages )
 """
+from typing import List, Tuple
 
 
 def number_swapper(a: int, b: int) -> tuple:
@@ -435,3 +436,65 @@ def pond_sizes(matrix: list) -> list:
 # colg = [2, 3, 0, 0]
 # colh = [1, 0, 1, 1]
 # print(pond_sizes([cole, colf, colg, colh]))
+
+
+def sum_swap(arr_a: List[int], arr_b: List[int]) -> Tuple[int, int]:
+    """16.21"""
+    sum_a = sum(arr_a)
+    sum_b = sum(arr_b)
+    diff = (sum_b - sum_a) / 2
+
+    set_a = set(arr_a)
+
+    for item in arr_b:
+        if (item - diff) in set_a:
+            return (item, item - diff)
+
+    raise Exception('not found')
+
+
+# print(sum_swap([3, 6, 3, 3], [1, 1, 1]))
+
+
+def resolve_number(exp, idx) -> Tuple[int, int]:
+    """16.26 helper"""
+    res = []
+    while idx < len(exp) and exp[idx] not in ['+', '-', '*', '/']:
+        res.append(int(exp[idx]))
+        idx += 1
+
+    mul = 1
+    n = 0
+    for i in range(len(res)-1, -1, -1):
+        n += mul * res[i]
+        mul *= 10
+
+    return n, idx
+
+
+def calc_next(exp: str, idx: int) -> float:
+    """16.26 helper"""
+    num, idx = resolve_number(exp, idx)
+    while idx < len(exp):
+        if exp[idx] == '+':
+            return num + calc_next(exp, idx + 1)
+        elif exp[idx] == '-':
+            return num - calc_next(exp, idx + 1)
+        elif exp[idx] == '*':
+            new_num, idx = resolve_number(exp, idx + 1)
+            num *= new_num
+        elif exp[idx] == '/':
+            new_num, idx = resolve_number(exp, idx + 1)
+            num /= new_num
+
+    return num
+
+
+def calculator(exp: str) -> float:
+    """16.26"""
+    if len(exp) == 0:
+        return 0
+    return calc_next(exp, 0)
+
+
+print(calculator('2*3+5/6*3+15'))
