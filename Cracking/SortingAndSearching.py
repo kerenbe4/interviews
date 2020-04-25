@@ -203,3 +203,40 @@ def merge_sort_main(arr: List[int]):
 # a = [3, 8, 1, 6, 0, 1, 2, 7]
 # merge_sort_main(a)
 # print(a)
+
+
+def bsr(arr: List[int], num: int, low: int, high: int) -> int:
+    if low > high:
+        return -1
+    mid = (low + high) // 2
+    if arr[mid] == num:
+        return mid
+    if arr[mid] > num:
+        return bsr(arr, num, low, mid - 1)
+    else:
+        return bsr(arr, num, mid + 1, high)
+
+
+def binary_search_rec(arr: List[int], num: int) -> int:
+    return bsr(arr, num, 0, len(arr) - 1)
+
+
+def binary_search_iter(arr: List[int], num: int) -> int:
+    low = 0
+    high = len(arr) - 1
+
+    while low <= high:
+        mid = (low + high) // 2
+        if arr[mid] == num:
+            return mid
+        if arr[mid] > num:
+            high = mid - 1
+        else:
+            low = mid + 1
+
+    return -1
+
+
+# a = [1, 4, 8, 11, 12, 17, 20, 26, 38]
+# print(binary_search_iter(a, 19))
+# print(binary_search_rec(a, 19))
