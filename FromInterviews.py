@@ -1,5 +1,6 @@
 import math
-from typing import List, Tuple, Set
+import random
+from typing import List, Tuple, Set, Any
 from Cracking.StacksAndQueues import Queue
 
 """
@@ -681,8 +682,6 @@ Facebook screening interview with Orit Mussel
 Given a group of ints and an int k, return the number of subgroups such that s: min{s} + max{s} <= k
 Example: input: [4 2 5 7], k=8 => output: 5. ([4 2 5], [4 2], [2 5], [4], [2])
 """
-
-
 def subgroup_count(nums: List[int], k: int) -> int:
     if len(nums) == 0:
         return 0
@@ -704,4 +703,164 @@ def subgroup_count(nums: List[int], k: int) -> int:
     return total_count
 
 
-print(subgroup_count([4, 2, 5, 7], 8))
+# print(subgroup_count([4, 2, 5, 7], 8))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Facebook full day interview from Doron's file (#5)
+Detect whether an integer number is strobomorphic - remains the same when flipped horizontally AND vertically. ex: 101, 986.
+(strobogrammatic number is a number that is the same when rotated180 degrees (69, 96, 1001)
+"""
+
+
+def num_to_digits_lst(num: int) -> List[int]:
+    res = []
+    while num > 0:
+        res.insert(0, num % 10)
+        num //= 10
+
+    return res
+
+
+def is_strobogrammatic(num: int) -> bool:
+    strobo = {0: 0, 1: 1, 8: 8, 6: 9, 9: 6}
+    symet = [0, 1, 8]
+    digits = num_to_digits_lst(num)
+    digit_count = len(digits)
+    if digit_count % 2 != 0 and digits[digit_count // 2] not in symet:
+        return False
+
+    for i in range(digit_count // 2):
+        if digits[i] != strobo[digits[digit_count-1-i]]:
+            return False
+    return True
+
+
+# print(is_strobogrammatic(111))
+# ------------------------------------------------------------------------------------
+
+
+"""
+Google full day - interview with Oren Bernstein 
+A car, with a tank of volume K liters, and a constant fuel consumption of 1 liter per kilometer, starts driving in a 
+straight line from the origin towards a destination D kilometers away.
+Along the road, there are N fuel stations, each at a distance di away from the origin. The cost of fuel at each fuel station is pi.
+Write a function to compute the cheapest cost of fuel to reach the destination. Assume that the car starts with a full tank.
+"""
+def minimal_partial(tank_volume: int, fuel_dist: List[int], fuel_price: List[float], min_gas_idx: int, max_gas_idx:int,
+                    dest: int, distance_passed: int, gas_available: int) -> Tuple[float, int]:
+    total_price = 0
+    if dest <= gas_available:
+        return total_price, gas_available - dest
+
+    if min_gas_idx > max_gas_idx:
+        raise Exception
+
+    # find cheapest gas station
+    cheapest_gas_station_idx = min_gas_idx
+    for idx in range(min_gas_idx + 1, max_gas_idx + 1, 1):
+        if fuel_price[idx] < fuel_price[cheapest_gas_station_idx]:
+            cheapest_gas_station_idx = idx
+
+    # get result till the cheapest gas station
+    distance_for_first_part = fuel_dist[cheapest_gas_station_idx] - distance_passed
+    price_till_cheapest, gas_left = minimal_partial(tank_volume, fuel_dist, fuel_price, min_gas_idx,
+                                                    cheapest_gas_station_idx - 1, distance_for_first_part,
+                                                    distance_passed, gas_available)
+
+    total_price += price_till_cheapest
+    new_distance_passed = fuel_dist[cheapest_gas_station_idx]
+
+    distance_left = dest - distance_for_first_part
+    if distance_left > gas_left:
+        # decide how much to fuel in cheapest gas station
+        gas_to_fuel = min(distance_left - gas_left, tank_volume - gas_left)
+        gas_left += gas_to_fuel
+        total_price += gas_to_fuel * fuel_price[cheapest_gas_station_idx]
+
+    # get cheapest price from here to the end
+    cheapest_price_for_rest, gas_left = minimal_partial(tank_volume, fuel_dist, fuel_price, cheapest_gas_station_idx + 1,
+                                                        max_gas_idx, distance_left,
+                                                        new_distance_passed, gas_left)
+    total_price += cheapest_price_for_rest
+
+    return total_price, gas_left
+# ------------------------------------------------------------------------------------
+
+
+"""
+Facebook full day - From Doron's file #17
+Write a minesweeper generator (receiving columns, rows, number of mines) 
+"""
+def update_numbers(ms_board: List[List[Any]], m: int, n: int):
+    for i in range(-1, 2, 1):
+        for j in range(-1, 2, 1):
+            if 0 <= m + i < len(ms_board) and 0 <= n + j < len(ms_board[0]) and ms_board[m + i][n + j] != 'm':
+                ms_board[m + i][n + j] += 1
+
+
+def randomize_mine(rows: int, columns: int):
+    x = random.randint(0, rows - 1)
+    y = random.randint(0, columns - 1)
+    return y, x
+
+
+def minesweeper(rows: int, columns: int, mines: int) -> List[List[Any]]:
+    # initialize
+    ms_board = [[0] * rows for _ in range(columns)]
+
+    # randomize mines, add numbers
+    mines_count = mines
+    while mines_count > 0:
+        m, n = randomize_mine(rows, columns)
+        if ms_board[m][n] != 'm':
+            mines_count -= 1
+            ms_board[m][n] = 'm'
+            update_numbers(ms_board, m, n)
+
+    return ms_board
+
+
+# b = minesweeper(4, 6, 5)
+# for r in b:
+#     print(r)
+# ------------------------------------------------------------------------------------
+
+
+"""
+Facebook full day - From Doron's file #6
+Given an array of words, and an alternative alphabet - return true/false indicating whether the words array is sorted
+based on the alternative alphabet. 
+"""
+def is_words_ordered(first: str, last:str, mapping: dict) -> bool:
+    i = 0
+    while i < len(first) and i < len(last):
+        if mapping[first[i]] == mapping[last[i]]:
+            i += 1
+        elif mapping[first[i]] < mapping[last[i]]:
+            return True
+        else:
+            return False
+
+    if len(last) < len(first):
+        return False
+    return True
+
+
+def is_valid(new_alpha: List[str], words: List[str]) -> bool:
+    mapping = {}
+    value = 0
+    for c in new_alpha:
+        mapping[c] = value
+        value += 1
+
+    for i in range(len(words) - 1):
+        if not is_words_ordered(words[i], words[i+1], mapping):
+            return False
+
+    return True
+
+
+# alph = ['b', 'c', 'a']
+# print(is_valid(alph, ['ca', 'cab', 'ca']))
