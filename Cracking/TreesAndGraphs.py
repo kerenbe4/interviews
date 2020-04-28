@@ -2,10 +2,10 @@ from Cracking.StacksAndQueues import Stack, Queue
 
 
 class Node:
-    def __init__(self, data, children=[]):
+    def __init__(self, data, children=None):
         self.data = data
         self.visited = False
-        self.children = children
+        self.children = [] if children is None else children
 
 
 class BtNode:
@@ -104,7 +104,7 @@ def construct_min_tree(numbers, fromm, to):
     if fromm == to:
         return Node(numbers[fromm])
 
-    mid_number_idx = ((to - fromm) // 2) + fromm
+    mid_number_idx = (to + fromm) // 2
     mid_number = numbers[mid_number_idx]
     return Node(mid_number, [construct_min_tree(numbers, fromm, mid_number_idx - 1),
                              construct_min_tree(numbers, mid_number_idx + 1, to)])
