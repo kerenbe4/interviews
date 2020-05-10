@@ -67,3 +67,10 @@ my_list.sort(key=lambda p: p.ht)
 # copy a 2d list
 a = [[1, 2], [3, 4]]
 b = [x[:] for x in a]
+
+
+# zip
+first = 'asd'
+last = '2w3'
+for f, l in zip(first, last):
+    print(f, l)
