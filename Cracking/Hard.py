@@ -1,4 +1,5 @@
-from typing import List
+from heapq import heapify, heappush, heapreplace
+from typing import List, Set
 
 
 def real_random(i):
@@ -202,6 +203,34 @@ def bi_node(root: BiNode) -> BiNode:
 #     res = res.node1
 
 
+def kth_smallest(nums: List[int], k: int) -> int:
+    """17.14 reflect"""
+    # wasn’t implemented
+    return 0
+
+
+def kth_largest(nums: List[int], k: int) -> int:
+    """17.14"""
+    n = len(nums)
+    if k <= 0 or k > n:
+        raise Exception
+
+    if k > n // 2:
+        return kth_smallest(nums, n - k)
+
+    min_heap = nums[:k]
+    heapify(min_heap)
+
+    for idx in range(k, n, 1):
+        if nums[idx] > min_heap[0]:
+            heapreplace(min_heap, nums[idx])
+
+    return min_heap[0]
+
+
+# print(kth_largest([6, 2, 1, 7, -3, 4, 8], 3))
+
+
 def m(appointments: list, appointment_idx: int, memo: dict) -> int:
     """17.16 helper"""
     if appointment_idx >= len(appointments):
@@ -226,3 +255,35 @@ def masseuse(appointments: list) -> int:
 
 # p = [30, 15, 60, 75, 45, 15, 15, 45]
 # print(masseuse(p))
+
+
+def one_away_options(word: str, words: Set[str]) -> List[str]:
+    """17.22 helper mock"""
+    s = {
+        'car': ['cat'],
+        'cat': ['car', 'coat', 'mat'],
+        'coat': ['cat'],
+        'mat': ['cat', 'math'],
+        'math': ['mat']
+    }
+    return s[word]
+
+
+def word_transformer(start_word: str, end_word: str, words: Set[str]) -> List[str]:
+    """17.22"""
+    visited = {start_word}
+    q = [(start_word, [])]
+
+    while len(q) > 0:
+        word, path_so_far = q.pop(0)
+        path_so_far.append(word)
+        if word == end_word:
+            return path_so_far
+        next_words = one_away_options(word, words)
+        for next_word in next_words:
+            if next_word not in visited:
+                visited.add(next_word)
+                q.append((next_word, path_so_far.copy()))
+
+
+# print(word_transformer('cat', 'math', {'car', 'cat', 'coat', 'mat', 'math'}))
