@@ -1,6 +1,6 @@
 import math
 import random
-from typing import List, Tuple, Set, Any
+from typing import List, Tuple, Set, Any, Dict
 from Cracking.StacksAndQueues import Queue
 
 """
@@ -26,6 +26,19 @@ def is_subarray(nums: List[int], x: int) -> bool:
             sums -= nums[lower_idx]
             lower_idx += 1
 
+    return False
+
+
+def is_subarray2(nums: List[int], k: int):
+    left = 0
+    temp_sum = 0
+    for i in range(len(nums)):
+        temp_sum += nums[i]
+        while temp_sum > k:
+            temp_sum -= nums[left]
+            left += 1
+        if temp_sum == k:
+            return True
     return False
 
 
@@ -715,6 +728,7 @@ Detect whether an integer number is strobomorphic - remains the same when flippe
 
 
 def num_to_digits_lst(num: int) -> List[int]:
+    #  [int(d) for d in str(n)]
     res = []
     while num > 0:
         res.insert(0, num % 10)
@@ -725,10 +739,10 @@ def num_to_digits_lst(num: int) -> List[int]:
 
 def is_strobogrammatic(num: int) -> bool:
     strobo = {0: 0, 1: 1, 8: 8, 6: 9, 9: 6}
-    symet = [0, 1, 8]
+    symmetric = {0, 1, 8}
     digits = num_to_digits_lst(num)
     digit_count = len(digits)
-    if digit_count % 2 != 0 and digits[digit_count // 2] not in symet:
+    if digit_count % 2 != 0 and digits[digit_count // 2] not in symmetric:
         return False
 
     for i in range(digit_count // 2):
@@ -833,15 +847,21 @@ Facebook full day - From Doron's file #6
 Given an array of words, and an alternative alphabet - return true/false indicating whether the words array is sorted
 based on the alternative alphabet. 
 """
-def is_words_ordered(first: str, last:str, mapping: dict) -> bool:
-    i = 0
-    while i < len(first) and i < len(last):
-        if mapping[first[i]] == mapping[last[i]]:
-            i += 1
-        elif mapping[first[i]] < mapping[last[i]]:
+def is_words_ordered(first: str, last:str, mapping: Dict[str, int]) -> bool:
+    for f, l in zip(first, last):
+        if mapping[f] < mapping[l]:
             return True
-        else:
+        elif mapping[f] > mapping[l]:
             return False
+
+    # i = 0
+    # while i < len(first) and i < len(last):
+    #     if mapping[first[i]] == mapping[last[i]]:
+    #         i += 1
+    #     elif mapping[first[i]] < mapping[last[i]]:
+    #         return True
+    #     else:
+    #         return False
 
     if len(last) < len(first):
         return False
@@ -849,11 +869,7 @@ def is_words_ordered(first: str, last:str, mapping: dict) -> bool:
 
 
 def is_valid(new_alpha: List[str], words: List[str]) -> bool:
-    mapping = {}
-    value = 0
-    for c in new_alpha:
-        mapping[c] = value
-        value += 1
+    mapping = {c: v for v, c in enumerate(new_alpha)}
 
     for i in range(len(words) - 1):
         if not is_words_ordered(words[i], words[i+1], mapping):
@@ -863,4 +879,51 @@ def is_valid(new_alpha: List[str], words: List[str]) -> bool:
 
 
 # alph = ['b', 'c', 'a']
-# print(is_valid(alph, ['ca', 'cab', 'ca']))
+# print(is_valid(alph, ['ca', 'cab']))
+
+
+"""
+Facebook full day - interview with Asaf ziv
+you are given 2 lists of intervals (each one is ordered and doesn't dissect itself).
+you need to write a function that will return all the common parts of the intervals from the 2 lists.
+Example: 
+A = [(1, 2), (3, 4), (7, 10)]
+B = [(0, 2), (3, 8), (9, 12)]
+
+Result = [(1, 2) (3, 4) (7, 8) (9, 10)] 
+"""
+def compare_intervals(interval_a: Tuple[int, int], interval_b: Tuple[int, int]) -> Tuple[bool, Tuple[int, int]]:
+    interval_begin = max(interval_a[0], interval_b[0])
+    interval_end = min(interval_a[1], interval_b[1])
+
+    if interval_begin < interval_end:
+        return True, (interval_begin, interval_end)
+    else:
+        return False, (0, 0)
+
+
+def common_intervals(intervals_a: List[Tuple[int, int]], intervals_b: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
+    results = []
+    a_idx = 0
+    b_idx = 0
+
+    while a_idx < len(intervals_a) and b_idx < len(intervals_b):
+        found_interval, new_interval = compare_intervals(intervals_a[a_idx], intervals_b[b_idx])
+        if found_interval:
+            results.append(new_interval)
+
+        end_a = intervals_a[a_idx][1]
+        end_b = intervals_b[b_idx][1]
+
+        if end_a <= end_b:
+            a_idx += 1
+
+        if end_b <= end_a:
+            b_idx += 1
+
+    return results
+
+
+# print(common_intervals([(1, 2), (4, 5)], [(0, 3), (4, 5)]))
+# print(common_intervals([(1, 2)], [(8, 9)]))
+# print(common_intervals([(1, 2), (3, 4), (7, 10)], [(0, 2), (3, 8), (9, 12)]))
