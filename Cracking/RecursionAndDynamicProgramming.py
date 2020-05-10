@@ -1,3 +1,6 @@
+from typing import List
+
+
 def triple_step_rec(steps):
     """8.1.1"""
     print("triple_step_rec", steps)
@@ -214,12 +217,11 @@ def parentheses(n: int):
 
 # parentheses(4)
 
-def pf(screen: list, x, y, new_color, old_color):
+def pf(screen: List[List[str]], x, y, new_color, old_color):
     """8.10 helper"""
     if x < 0 or y < 0 or y > len(screen[0]) - 1 or x > len(screen) - 1 or screen[x][y] != old_color:
         return
 
-    old_color = screen[x][y]
     screen[x][y] = new_color
     for i in range(-1, 2, 1):
         for j in range(-1, 2, 1):
@@ -309,6 +311,44 @@ def eight_queens():
 # eight_queens()
 
 
+def n_is_valid_placement(row: int, column: int, placements: list) -> bool:
+    """8.12 helper"""
+    # For each placement, check col and diagonals
+    for r in range(row):
+        c = placements[r]
+        if c == column:
+            return False
+        row_distance = abs(row - r)
+        column_distance = abs(column - c)
+        if row_distance == column_distance:
+            return False
+
+    return True
+
+
+def n_eq(n: int, placements: list, row: int, results: list):
+    """8.12 helper"""
+    if row == n:
+        results.append(placements.copy())
+        return
+
+    for column in range(n):
+        if n_is_valid_placement(row, column, placements):
+            placements[row] = column
+            n_eq(n, placements, row + 1, results)
+
+
+def n_queens(n: int):
+    """8.12 book implementation"""
+    results = []
+    row_to_column_placements = [0] * n
+    n_eq(n, row_to_column_placements, 0, results)
+    return results
+
+
+# print(n_queens(8))
+
+
 class Box:
     """8.13 helper"""
     def __init__(self, w, h, d):
@@ -345,4 +385,4 @@ b = [
     Box(8, 4, 1)
 ]
 # print(stack_of_boxes(b))
-print(stack_of_boxes(b))
+# print(stack_of_boxes(b))
